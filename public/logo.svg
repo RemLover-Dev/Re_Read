@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#f472b6" />
+    </linearGradient>
+    <linearGradient id="pageGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#e0e7ff" stop-opacity="0.95" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded rectangle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" stroke="url(#accentGrad)" stroke-width="8" stroke-opacity="0.6" />
+
+  <!-- Outer ambient glow circle -->
+  <circle cx="256" cy="256" r="180" fill="url(#accentGrad)" opacity="0.12" filter="url(#glow)" />
+
+  <!-- Stylized Open Book -->
+  <g transform="translate(256, 270)" filter="url(#glow)">
+    <!-- Left Page -->
+    <path d="M -12 -50 C -60 -75 -120 -60 -150 -40 C -155 -36 -158 -30 -158 -24 L -158 90 C -158 96 -153 102 -146 100 C -116 85 -60 75 -12 95 Z" 
+          fill="url(#pageGrad)" />
+    <!-- Right Page -->
+    <path d="M 12 -50 C 60 -75 120 -60 150 -40 C 155 -36 158 -30 158 -24 L 158 90 C 158 96 153 102 146 100 C 116 85 60 75 12 95 Z" 
+          fill="url(#pageGrad)" />
+
+    <!-- Spine / Center Ribbon -->
+    <path d="M -6 -54 Q 0 -50 6 -54 L 6 100 Q 0 104 -6 100 Z" fill="#6366f1" />
+    
+    <!-- Left Page Lines -->
+    <line x1="-135" y1="-10" x2="-35" y2="-5" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+    <line x1="-135" y1="20" x2="-45" y2="25" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+    <line x1="-135" y1="50" x2="-55" y2="55" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+
+    <!-- Right Page Lines -->
+    <line x1="35" y1="-5" x2="135" y2="-10" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+    <line x1="45" y1="25" x2="135" y2="20" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+    <line x1="55" y1="55" x2="135" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+  </g>
+
+  <!-- Floating Stylized "Re:" Emblem above book -->
+  <g transform="translate(256, 150)">
+    <!-- Aperture / Halo ring -->
+    <circle cx="0" cy="0" r="46" fill="none" stroke="url(#accentGrad)" stroke-width="5" opacity="0.8" />
+    <circle cx="0" cy="0" r="36" fill="#1e1b4b" opacity="0.9" />
+
+    <!-- Stylized R text or symbol -->
+    <text x="-16" y="14" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="42" font-weight="900" fill="url(#accentGrad)">R</text>
+    <circle cx="16" cy="-2" r="4.5" fill="#f472b6" />
+    <circle cx="16" cy="12" r="4.5" fill="#38bdf8" />
+  </g>
+
+  <!-- Decorative sparkles -->
+  <path d="M 120 140 Q 125 150 135 155 Q 125 160 120 170 Q 115 160 105 155 Q 115 150 120 140 Z" fill="#38bdf8" opacity="0.8" />
+  <path d="M 390 130 Q 395 140 405 145 Q 395 150 390 160 Q 385 150 375 145 Q 385 140 390 130 Z" fill="#f472b6" opacity="0.8" />
+</svg>

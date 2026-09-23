@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #38BDF8;
+  --color-secondary: #E0F2FE;
+  --surface-glass: rgba(12, 24, 48, 0.65);
+  --text-primary: #F0F9FF;
+  --text-muted: #93C5FD;
+  --border-glow: rgba(56, 189, 248, 0.35);
+  --code-bg: rgba(7, 16, 34, 0.85);
+  --glass-opacity: 0.20;
+  --pdf-filter: invert(0.92) hue-rotate(200deg) brightness(0.96);
+  --font-persian: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+  --font-english: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, monospace;
+}
+
+/* Custom Scrollbar for Glass Aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  backdrop-filter: blur(4px);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+  opacity: 0.8;
+}
+
+/* BiDi Document Typography Engine */
+.re-read-content {
+  font-family: var(--font-persian), var(--font-english);
+  color: var(--text-primary);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.re-read-content [dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+  line-height: 1.9;
+}
+
+.re-read-content [dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+  line-height: 1.7;
+}
+
+/* LaTeX Inline Math Isolator */
+.re-read-content .katex-isolate {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  display: inline-block !important;
+  padding: 0 4px;
+  vertical-align: middle;
+}
+
+/* LaTeX Display Math Block */
+.re-read-content .katex-display-isolate {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  text-align: center !important;
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Inline Code Isolator */
+.re-read-content code:not(pre code) {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  display: inline-block;
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Glass panel utility */
+.glass-panel {
+  background-color: var(--surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glow);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Titlebar Drag Region */
+.titlebar-drag-region {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.titlebar-no-drag {
+  -webkit-app-region: no-drag;
+}

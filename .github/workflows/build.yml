@@ -1,0 +1,92 @@
+name: Build Windows App (.exe)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows x64 (.exe)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install frontend dependencies
+        run: npm ci || npm install
+
+      - name: Build Tauri Desktop (.exe & installer)
+        run: npx @tauri-apps/cli build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path "release-artifacts" -Force
+
+          # Copy standalone executable
+          if (Test-Path "src-tauri/target/release/re-read.exe") {
+            Copy-Item "src-tauri/target/release/re-read.exe" "release-artifacts/ReRead-standalone.exe"
+            Write-Host "Copied standalone re-read.exe"
+          }
+
+          # Copy NSIS installer (.exe)
+          if (Test-Path "src-tauri/target/release/bundle/nsis") {
+            Get-ChildItem -Path "src-tauri/target/release/bundle/nsis/*.exe" | ForEach-Object {
+              Copy-Item $_.FullName "release-artifacts/"
+              Write-Host "Copied installer: $($_.Name)"
+            }
+          }
+
+          # Copy MSI installer (.msi) if present
+          if (Test-Path "src-tauri/target/release/bundle/msi") {
+            Get-ChildItem -Path "src-tauri/target/release/bundle/msi/*.msi" | ForEach-Object {
+              Copy-Item $_.FullName "release-artifacts/"
+              Write-Host "Copied MSI: $($_.Name)"
+            }
+          }
+
+          Write-Host "Prepared artifacts:"
+          Get-ChildItem -Path "release-artifacts"
+
+      - name: Upload Artifacts (.exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ReRead-Windows-x64
+          path: release-artifacts/*
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
