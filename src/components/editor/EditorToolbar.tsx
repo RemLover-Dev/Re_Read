@@ -13,7 +13,7 @@ export const EditorToolbar: React.FC = () => {
   const charsCount = markdownContent.length;
 
   return (
-    <div className="h-10 px-4 border-b border-white/10 bg-black/30 backdrop-blur-md flex items-center justify-between text-xs text-slate-300">
+    <div className="h-10 px-4 border-b border-white/10 bg-black/50 flex items-center justify-between text-xs text-slate-300">
       <div className="flex items-center space-x-1">
         <button
           onClick={() => insertSnippet('**', '**')}

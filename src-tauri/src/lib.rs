@@ -7,6 +7,16 @@ use tauri::Manager;
 use window::vibrancy::apply_effect;
 
 pub fn run() {
+    #[cfg(target_os = "windows")]
+    {
+        if std::env::var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS").is_err() {
+            std::env::set_var(
+                "WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
+                "--enable-pinch --enable-viewport --enable-features=TouchpadOverscrollHistoryNavigation",
+            );
+        }
+    }
+
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
@@ -17,6 +27,22 @@ pub fn run() {
                 {
                     // Default to Windows 11 Mica blur
                     let _ = apply_effect(&main_window, "mica");
+
+                    let _ = main_window.with_webview(|webview| {
+                        unsafe {
+                            use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings5;
+                            use windows_core::Interface;
+                            let controller = webview.controller();
+                            if let Ok(core) = controller.CoreWebView2() {
+                                if let Ok(settings) = core.Settings() {
+                                    let _ = settings.SetIsZoomControlEnabled(true);
+                                    if let Ok(settings5) = settings.cast::<ICoreWebView2Settings5>() {
+                                        let _ = settings5.SetIsPinchZoomEnabled(true);
+                                    }
+                                }
+                            }
+                        }
+                    });
                 }
             }
             Ok(())

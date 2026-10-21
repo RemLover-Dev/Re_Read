@@ -1,254 +1,167 @@
 <div align="center">
 
-# 📖 Re:Read
+# Re:Read 0.2.0
 
-### Aesthetic BiDi Markdown, LaTeX & PDF Desktop Reader with Dynamic Anime Themes
+A desktop reader for Markdown, PDF, EPUB, comics and manga, with Persian/English typography and Re:Zero themes.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Tauri v2](https://img.shields.io/badge/Tauri-v2-24C8DB?style=for-the-badge&logo=tauri&logoColor=white)](https://v2.tauri.app/)
-[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.1-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://microsoft.com/windows)
-
-[English](README.md) • [فارسی (Persian)](README.fa.md)
+[English](README.md) · [فارسی](README.fa.md)
 
 </div>
 
----
+## Features
 
-## 🌟 Overview
+- Markdown editing with a live preview, GitHub-flavored tables, task lists and KaTeX mathematics.
+- Bidirectional Persian/Arabic and English paragraphs with inline isolation for code and numbers.
+- PDF reading with page navigation and zoom.
+- ZIP/CBZ and RAR/CBR comics: natural page order, manga RTL, comic LTR, webtoon strips, single/double pages and zoom.
+- EPUB 2/3, FB2 and text novels: readable text and illustrations, nested contents, chapter links and typography controls.
+- 43 Re:Zero character themes, wallpaper controls and a streamer overlay.
+- Tauri desktop distribution for Windows and Linux; Electron is also available for development.
 
-**Re:Read** is a high-performance, aesthetic desktop reader and editor designed for modern note-taking, technical reading, and streaming. Built with **Tauri v2**, **React**, **TypeScript**, and **Rust**, it combines a clean glassmorphism UI with native Windows 11/10 vibrancy, full bidirectional (BiDi) text isolation for Persian/Arabic, KaTeX mathematical typesetting, PDF rendering, and an immersive **42-character Re:Zero theme engine**.
+The EPUB reader opens at the first linear text chapter and keeps the cover accessible through Contents or chapter navigation. It reflows publisher content using the reader's typography. DRM-protected books are not supported.
 
-Whether you are studying technical documents with complex math formulas, taking notes in right-to-left languages with inline English, reading PDF textbooks, or streaming notes with animated overlays, Re:Read provides a fluid, distraction-free environment.
+## Requirements
 
----
+- Node.js 24 and npm. The test command uses Node's built-in TypeScript stripping.
+- For Tauri: stable Rust and the native dependencies listed in [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/).
+- Windows: Microsoft C++ Build Tools and WebView2.
+- Linux: WebKitGTK 4.1, GTK 3 and the build packages below.
 
-## ✨ Key Features
-
-### 📝 Bidirectional (BiDi) Markdown Pipeline
-- **Smart Paragraph Detection**: Automatically detects RTL (Persian, Arabic, Hebrew) and LTR (English, code) paragraphs on a block-by-block basis.
-- **Inline Isolation**: Preserves English phrases, inline code snippets (`` `code` ``), and numerical data inside RTL sentences without layout inversion or punctuation flipping.
-- **Syntax Highlighting & Formatting**: Full GitHub-Flavored Markdown (GFM) tables, task lists, blockquotes, and headings.
-
-### 📐 LaTeX & Mathematical Typesetting
-- **KaTeX Integration**: High-speed mathematical rendering for inline equations (`$E=mc^2$`) and display blocks (`$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$`).
-- **Directional Isolation**: Equations remain strictly LTR formatted even within RTL Persian/Arabic paragraphs.
-
-### 📑 Integrated PDF Reader
-- **Canvas-Accelerated PDF Viewer**: Powered by `pdfjs-dist` for fast rendering of local PDF documents.
-- **Reading Controls**: Page navigation, zoom in/out, fit-to-page, and continuous scrolling.
-
-### 🎨 42-Character Re:Zero Dynamic Theme Engine
-- **42 Unique Character Profiles**: Spanning all 8 factions (Emilia Camp, Crusch Camp, Anastasia Camp, Priscilla Camp, Felt Camp, Witches of Sin, Witch Cult, and Historical Rogues).
-- **Tailored Color Schemes**: Handcrafted color palettes matching each character's identity (Rem, Ram, Emilia, Beatrice, Echidna, Subaru, Reinhard, and 35+ more).
-- **3-Tier Resilient Wallpaper Pipeline**:
-  1. High-resolution art dynamically fetched from Safebooru / Zerochan APIs.
-  2. Local persistent caching to minimize network usage.
-  3. Elegant mathematical gradients as instant fallback.
-
-### 🪟 Windows 11 / 10 Glassmorphism
-- **Frameless Acrylic & Mica Windows**: Native vibrancy blur backdrop powered by `window-vibrancy` in Rust and Electron's backdrop material.
-- **Custom Native-Style Titlebar**: Draggable window titlebar with minimize, maximize/restore, close buttons, mode switcher, and theme picker.
-
-### 🎥 Streamer & Presentation Overlay
-- **OBS / Presentation Friendly**: Built-in streamer overlay mode with floating badges and animated notification banners for screen recording or presentations.
-
-### ⚡ Dual Engine Architecture
-- **Tauri v2 (Primary)**: Ultra-small memory footprint (~30MB RAM) and blazing-fast native Rust backend.
-- **Electron (Fallback)**: Seamless fallback option ensuring portability across various Windows environments.
-
----
-
-## 🏗️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| **UI Framework** | React 18, TypeScript 5.7 |
-| **Bundler & Tooling** | Vite 6.1, PostCSS, Tailwind CSS |
-| **Editor** | CodeMirror 6 (`@codemirror/lang-markdown`, `@codemirror/theme-one-dark`) |
-| **Markdown & Math** | Unified, Remark-parse, Remark-rehype, Rehype-stringify, Remark-math, Rehype-katex, KaTeX |
-| **PDF Rendering** | PDF.js (`pdfjs-dist`) |
-| **State Management** | Zustand 5 |
-| **Icons** | Lucide React |
-| **Desktop Backend** | Tauri v2 (Rust, `tauri-plugin-shell`, `tauri-plugin-fs`, `window-vibrancy`, `tokio`, `reqwest`) |
-| **Alternative Desktop** | Electron 44 |
-| **CI/CD** | GitHub Actions (`windows-latest`, Tauri build & artifact upload) |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-Ensure you have installed:
-1. **Node.js** (v18 or v20 LTS recommended): [Download Node.js](https://nodejs.org/)
-2. **Rust & Cargo** (required for building the Tauri app): [Install Rust](https://rustup.rs/)
-3. **C++ Build Tools for Windows**: Visual Studio Build Tools with C++ workload (or Visual Studio Community).
-
-### Installation
-
-Clone the repository and install dependencies:
+On Ubuntu 22.04:
 
 ```bash
-git clone https://github.com/your-username/reread.git
-cd reread
-npm install
+sudo apt-get update
+sudo apt-get install -y build-essential libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf xdg-utils libfuse2
 ```
 
-### Environment Configuration
+## Install and develop
 
-Copy `.env.example` to `.env`:
+Clone your repository, enter its root directory, then install the locked dependencies:
 
 ```bash
-cp .env.example .env
+npm ci
 ```
 
-Configure your parameters (optional):
-```env
-# Optional Zerochan login for automated character wallpaper scraping
-ZEROCHAN_LOGIN=your_username
-ZEROCHAN_PASSWORD=your_password
+The optional `.env` settings are described in `.env.example`. Keep credentials in your local `.env`.
 
-# Port configuration (defaults to 1420)
-PORT=1420
-```
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Browser frontend at http://127.0.0.1:1420 |
+| `npm run desktop` | Electron development app |
+| `npm run desktop:tauri` | Tauri development app |
+| `npm test` | Parser, layout, BiDi, query and theme tests |
+| `npm run build` | TypeScript check and production frontend |
+| `npm run release:check` | Check synchronized versions and release tag |
+| `npm run release:icons` | Prepare missing native application icons |
 
----
+`@xmldom/xmldom` is an application dependency of the EPUB reader. It is included in `package.json` and `package-lock.json`; `npm ci` installs it.
 
-## 💻 Running the App
+## Build installers locally
 
-### 1. Tauri Desktop (Recommended)
-
-Starts the Vite frontend dev server on port `1420` and launches the native Tauri Windows application:
+Run these on the target operating system after installing its Tauri prerequisites:
 
 ```bash
-npm run desktop:tauri
-# or
-npm run tauri:dev
+npm run release:check
+npm run release:icons
 ```
 
-### 2. Electron Desktop (Fallback)
-
-Starts the Vite dev server and launches the Electron shell:
+Windows:
 
 ```bash
-npm run desktop:electron
+npm run tauri:build -- --bundles nsis,msi
 ```
 
-### 3. Web Browser Dev Mode
-
-To develop or test the frontend in your browser:
+Linux:
 
 ```bash
-npm run dev
+npm run tauri:build -- --bundles deb,appimage
 ```
-Open [http://127.0.0.1:1420](http://127.0.0.1:1420) in your browser.
 
-### 4. Running Tests
+Outputs are under `src-tauri/target/release/bundle/`:
 
-Run the test suite covering BiDi compilation, Booru queries, and character registry validation:
+| Platform / architecture | Packages | Bundle subdirectories |
+| --- | --- | --- |
+| Windows x64 | NSIS setup `.exe`, `.msi` | `nsis/`, `msi/` |
+| Linux x64 | `.AppImage`, `.deb` | `appimage/`, `deb/` |
 
-```bash
+Existing icons are kept. If binary icons are missing, `release:icons` generates them from `app-icon.svg`, then `public/logo.svg`, or the included fallback `scripts/release-icon.svg`. Commit your preferred artwork and generated `src-tauri/icons/` files. Windows Mica effects are specific to Windows; Linux uses the reader's regular themed appearance.
+
+## GitHub Actions
+
+The workflow is `.github/workflows/build.yml`, named **Build Windows and Linux**. It uses Tauri to package installers; it does not package the Electron development shell.
+
+- Pushes to `main`/`master` and pull requests targeting those branches build both platforms and upload workflow artifacts.
+- **Actions → Build Windows and Linux → Run workflow** builds both platforms without creating a release.
+- Pushing `v0.2.0` builds both platforms and, after both succeed, creates a **draft GitHub Release** with their installers and SHA-256 checksums.
+- Workflow artifacts are named `ReRead-0.2.0-Windows-x64` and `ReRead-0.2.0-Linux-x64`, retained for 14 days.
+- After testing the installers, open **Releases**, edit the draft and choose **Publish release**. Release assets then remain available independently of workflow artifact retention.
+
+The workflow installs Linux native dependencies and uses Node 24, Rust stable, `npm ci`, the test suite and `tauri-action`. Its release job uses the automatically provided `GITHUB_TOKEN` with `contents: write`; a separate personal token is not required. Repository or organization policies must allow Actions to run and the release job to write repository contents. Installers are unsigned unless you add your own signing configuration.
+
+If another workflow already builds or publishes releases, merge or remove the overlapping triggers so one tag does not run duplicate release pipelines.
+
+## Prepare and push v0.2.0
+
+The release number must match in all four files:
+
+- `package.json`
+- `package-lock.json` (root and `packages[""].version`)
+- `src-tauri/Cargo.toml`
+- `src-tauri/tauri.conf.json`
+
+They are set to `0.2.0` in this update. Keep `README.md`, `README.fa.md` and `RELEASE_NOTES.md` in the same release commit. If `Cargo.lock` is already tracked, let Cargo update it and commit it too; otherwise generate and commit it with `cargo generate-lockfile --manifest-path src-tauri/Cargo.toml` for reproducible Rust resolution.
+
+From PowerShell in your existing clone:
+
+```powershell
+Set-Location -LiteralPath "E:\projects\RemLover-Dev\Rems Reader"
+npm ci
+npm run release:check
 npm test
+npm run build
+npm run release:icons
+cargo generate-lockfile --manifest-path src-tauri/Cargo.toml
+
+git status
+git diff
 ```
 
----
+Review the changed files, including both READMEs and the workflow. Stage the release configuration explicitly:
 
-## 📦 Building the Windows Executable (`.exe`)
-
-### Local Build
-
-To create the release executable and the NSIS setup installer locally:
-
-```bash
-npm run tauri:build
+```powershell
+git add .github/workflows/build.yml README.md README.fa.md RELEASE_NOTES.md .gitignore package.json package-lock.json scripts/check-release.mjs scripts/prepare-icons.mjs scripts/collect-release.mjs scripts/release-icon.svg src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/tauri.conf.json src-tauri/src/window/vibrancy.rs src-tauri/icons
 ```
 
-The output files will be created in:
-- **Standalone Executable**: `src-tauri/target/release/re-read.exe`
-- **Windows Setup Installer**: `src-tauri/target/release/bundle/nsis/ReRead_0.1.0_x64-setup.exe`
-- **MSI Installer**: `src-tauri/target/release/bundle/msi/ReRead_0.1.0_x64_en-US.msi`
+Commit any intended EPUB/comic fixes that are still uncommitted as part of this release too, then check the staged changes and push:
 
----
-
-## 🤖 GitHub Actions Automated Build
-
-This repository includes an automated CI/CD workflow (`.github/workflows/build.yml`) to compile the Windows `.exe` on GitHub:
-
-1. **Trigger Manually**: Go to the **Actions** tab on your GitHub repository, click **Build Windows App (.exe)**, and click **Run workflow**.
-2. **Trigger on Tag/Push**: Push a version tag (e.g. `git tag v0.1.0 && git push origin v0.1.0`), and GitHub Actions will automatically compile and publish the installers to **GitHub Releases**.
-3. **Download Artifacts**: When any run finishes, you can download the zipped `ReRead-Windows-x64` artifact containing both the standalone `.exe` and the NSIS setup installer directly from the workflow summary page!
-
----
-
-## ⌨️ Workspace Modes & Shortcuts
-
-| Mode | Shortcut / Action | Description |
-|---|---|---|
-| **Split Mode** | Mode switch in titlebar | Dual-pane: CodeMirror editor on the left, live BiDi/LaTeX reader on the right with resizable divider |
-| **Editor Mode** | Mode switch in titlebar | Full-screen Markdown editor with toolbar formatting buttons |
-| **Reader Mode** | Mode switch in titlebar | Distraction-free reading view with full BiDi isolation and KaTeX formulas |
-| **PDF Mode** | Mode switch in titlebar | Open and view PDF documents with page navigation and zoom |
-| **Booru Mode** | Mode switch in titlebar | Browse character artworks and select custom wallpapers |
-| **Theme Selector** | Palette icon in titlebar | Choose from 42 character themes across 8 factions |
-| **DevTools** | `F12` or `Ctrl + Shift + I` | Toggle developer console |
-
----
-
-## 📁 Project Structure
-
-```
-├── .github/
-│   └── workflows/
-│       └── build.yml          # GitHub Actions workflow for Windows .exe build
-├── electron/
-│   ├── main.cjs               # Electron main process with Acrylic blur
-│   └── preload.cjs            # Electron secure IPC bridge
-├── public/
-│   └── logo.svg               # Application branding icon
-├── scripts/
-│   ├── run-tauri.mjs          # Tauri CLI wrapper with Cargo PATH resolution
-│   ├── start-desktop.mjs      # Desktop launcher (Electron/Tauri)
-│   └── start-dev.mjs          # Vite supervisor with port conflict handling
-├── src/
-│   ├── components/
-│   │   ├── booru/             # Booru/Zerochan image browser
-│   │   ├── editor/            # CodeMirror editor & formatting toolbar
-│   │   ├── pdf/               # PDF.js document viewer
-│   │   ├── reader/            # BiDi Markdown & KaTeX reader component
-│   │   ├── streamer/          # Streamer / OBS overlay banner
-│   │   ├── themes/            # Character theme picker modal
-│   │   └── titlebar/          # Custom Windows Acrylic/Mica titlebar
-│   ├── core/
-│   │   ├── bidi/              # Bidirectional paragraph & inline isolation
-│   │   ├── booru/             # Booru API queries and tag builder
-│   │   └── wallpaper/         # Resilient 3-tier background pipeline
-│   ├── stores/                # Zustand stores (workspace, themes)
-│   ├── styles/                # Tailwind CSS globals and animations
-│   ├── themes/                # 42-character roster data & palette definitions
-│   ├── App.tsx                # Main application layout
-│   └── main.tsx               # React application entry point
-├── src-tauri/
-│   ├── capabilities/          # Tauri v2 security capabilities
-│   ├── icons/                 # Multi-resolution application icons (.ico, .png)
-│   ├── src/
-│   │   ├── commands/          # Custom Rust IPC commands
-│   │   ├── window/            # Native Windows Acrylic & Mica vibrancy
-│   │   └── main.rs            # Rust backend entry point
-│   ├── Cargo.toml             # Rust package configuration
-│   └── tauri.conf.json        # Tauri v2 application configuration
-├── tests/                     # Node.js automated test suites
-├── LICENSE                    # MIT License
-├── package.json               # Node.js dependencies and scripts
-└── vite.config.ts             # Vite configuration with port 1420
+```powershell
+git diff --cached --stat
+git diff --cached
+git commit -m "Release v0.2.0: Windows and Linux builds"
+git push origin HEAD
 ```
 
----
+`git push origin HEAD` pushes your current branch. If your repository requires a pull request, merge it before creating the version tag. On the final release commit:
 
-## 📄 License
+```powershell
+git tag -a v0.2.0 -m "Re:Read v0.2.0"
+git push origin v0.2.0
+```
 
-This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
+The tag push triggers the release build. Create the tag only once; if it already exists, inspect the existing tag and release before choosing a new version. Never force-push an existing published version tag.
 
-Copyright (c) 2025-2026 **RemLover-Dev**.
+For future versions, update the four version files, both READMEs and release notes, run `npm install --package-lock-only` after editing `package.json`, and rerun the release checks.
+
+## Project layout
+
+- `src/components/`: Markdown, PDF, EPUB, comic readers and shared controls.
+- `src/core/archive/`: Comic/EPUB/FB2 parsers, reading order and page layout.
+- `src-tauri/`: Rust desktop application and installer configuration.
+- `electron/`: Electron development shell.
+- `scripts/`: Development launchers and release helpers.
+- `tests/`: Automated tests and optional browser regressions.
+- `.github/workflows/build.yml`: Windows/Linux installer build and draft-release workflow.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

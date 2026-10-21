@@ -147,12 +147,15 @@ export const ResilientWallpaper: React.FC = () => {
           surface={currentCharacter.palette.surface}
         />
       ) : (
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out"
+        <img
+          src={resolvedSrc}
+          alt=""
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out"
           style={{
-            backgroundImage: `url("${resolvedSrc}")`,
             filter: `blur(${wallpaperBlur}px) brightness(${1 - wallpaperDim / 100})`,
-            transform: 'scale(1.05)', // Prevent edge blur bleeding
+            willChange: 'transform',
+            transform: 'translateZ(0) scale(1.05)', // Prevent edge blur bleeding & promote to GPU compositor layer
           }}
         />
       )}

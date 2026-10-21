@@ -93,7 +93,7 @@ export const CodeMirrorEditor: React.FC = () => {
   }, [markdownContent]);
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden bg-black/20 backdrop-blur-md">
+    <div className="h-full w-full flex flex-col overflow-hidden bg-black/40">
       <div ref={editorRef} className="h-full w-full overflow-hidden" />
     </div>
   );

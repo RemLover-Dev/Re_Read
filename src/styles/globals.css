@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* EPUBs reflow with reader typography, independently of the publisher's page CSS. */
+.epub-chapter-content { overflow-wrap: anywhere; }
+.epub-chapter-content p { margin: 0 0 1em; }
+.epub-chapter-content h1, .epub-chapter-content h2,
+.epub-chapter-content h3, .epub-chapter-content h4 { font-weight: 700; margin: 1.2em 0 .6em; }
+.epub-chapter-content h1 { font-size: 1.6em; }
+.epub-chapter-content h2 { font-size: 1.35em; }
+.epub-chapter-content h3 { font-size: 1.15em; }
+.epub-chapter-content img, .epub-chapter-content svg { max-width: 100%; height: auto; margin: 1em auto; }
+.epub-chapter-content ul, .epub-chapter-content ol { padding-inline-start: 1.5em; margin-block: 1em; }
+.epub-chapter-content ul { list-style: disc; }
+.epub-chapter-content ol { list-style: decimal; }
+.epub-chapter-content blockquote { border-inline-start: 3px solid var(--color-primary); padding-inline-start: 1em; margin-block: 1em; }
+.epub-chapter-content a[data-epub-href] { color: var(--color-primary); text-decoration: underline; }
+.epub-chapter-content table { max-width: 100%; border-collapse: collapse; }
+.epub-chapter-content td, .epub-chapter-content th { padding: .4em; border: 1px solid var(--border-glow); }
+.epub-chapter-content pre { white-space: pre-wrap; }
+
 :root {
   --color-primary: #38BDF8;
   --color-secondary: #E0F2FE;
@@ -106,4 +124,27 @@
 
 .titlebar-no-drag {
   -webkit-app-region: no-drag;
+}
+
+/* Performance Mode (Reduced Blur / Low-End GPU Optimization) */
+.performance-mode *,
+.performance-mode *::before,
+.performance-mode *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.performance-mode {
+  --glass-opacity: 0.85 !important;
+  --surface-glass: rgba(10, 15, 26, 0.94) !important;
+}
+
+.performance-mode .glass-panel {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: var(--surface-glass);
+}
+
+.performance-mode * {
+  transition-duration: 0.05s !important;
 }

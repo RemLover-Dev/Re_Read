@@ -101,7 +101,7 @@ export const BooruBrowser: React.FC = () => {
   };
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden bg-black/25 backdrop-blur-md text-slate-100">
+    <div className="h-full w-full flex flex-col overflow-hidden bg-black/40 text-slate-100">
       {/* Search Header Bar */}
       <div className="p-6 border-b border-white/10 bg-black/40 space-y-4">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">

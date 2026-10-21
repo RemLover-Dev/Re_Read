@@ -32,8 +32,9 @@ export class ThemeManager {
     // 2. Call Tauri native vibrancy bridge if available
     try {
       if (typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__) {
+        const isPerfMode = localStorage.getItem('reread_performance_mode') === 'true';
         const { invoke } = await import('@tauri-apps/api/core');
-        await invoke('set_window_vibrancy', { effect: character.windowVibrancy });
+        await invoke('set_window_vibrancy', { effect: isPerfMode ? 'none' : character.windowVibrancy });
       }
     } catch (e) {
       // Normal when previewing in browser or non-Windows platform

@@ -12,6 +12,12 @@ if (!currentPath.includes(cargoBinDir) && fs.existsSync(cargoBinDir)) {
   process.env.PATH = `${cargoBinDir}${path.delimiter}${currentPath}`;
 }
 
+// Enable Chromium pinch gestures and viewport scaling in WebView2
+if (!process.env.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS) {
+  process.env.WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS =
+    '--enable-pinch --enable-viewport --enable-features=TouchpadOverscrollHistoryNavigation';
+}
+
 const userArgs = process.argv.slice(2);
 const args = userArgs.length > 0 ? userArgs : ['dev'];
 const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';

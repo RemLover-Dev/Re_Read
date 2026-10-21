@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWorkspaceStore } from '../../stores/useWorkspaceStore';
 import { useThemeStore } from '../../stores/useThemeStore';
 import {
@@ -16,6 +16,9 @@ import {
   Aperture,
   ZoomIn,
   ZoomOut,
+  Layers,
+  BookText,
+  FolderOpen,
 } from 'lucide-react';
 
 interface WindowsTitlebarProps {
@@ -30,9 +33,21 @@ export const WindowsTitlebar: React.FC<WindowsTitlebarProps> = ({ onOpenThemeMod
     toggleStreamerMode,
     fontScale,
     setFontScale,
+    openFileFromBytes,
   } = useWorkspaceStore();
   const { currentCharacter } = useThemeStore();
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
+  const openFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileOpen = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const buffer = await file.arrayBuffer();
+      await openFileFromBytes(buffer, file.name);
+    }
+    // Reset input so same file can be reopened if desired
+    e.target.value = '';
+  };
 
   useEffect(() => {
     // Check initial maximize state in Tauri or Electron
@@ -150,68 +165,112 @@ export const WindowsTitlebar: React.FC<WindowsTitlebarProps> = ({ onOpenThemeMod
         </button>
       </div>
 
-      {/* Center Navigation Mode Switcher */}
-      <nav className="flex items-center bg-black/50 p-0.5 rounded-lg border border-white/10 titlebar-no-drag" style={noDragStyle}>
-        <button
-          onClick={() => setActiveMode('split')}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
-            activeMode === 'split' ? 'bg-primary text-black font-bold' : 'hover:text-white'
-          }`}
-          style={noDragStyle}
-          title="Split View (Editor + Live Reader)"
-        >
-          <Columns className="w-3 h-3" />
-          <span>Split</span>
-        </button>
+      {/* Center Navigation Mode Switcher & Open File */}
+      <div className="flex items-center space-x-2 titlebar-no-drag" style={noDragStyle}>
+        <input
+          type="file"
+          ref={openFileInputRef}
+          onChange={handleFileOpen}
+          accept=".md,.markdown,.txt,.pdf,.epub,.fb2,.fb2.zip,.cbz,.cbr,.zip,.rar"
+          className="hidden"
+        />
 
         <button
-          onClick={() => setActiveMode('editor')}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
-            activeMode === 'editor' ? 'bg-primary text-black font-bold' : 'hover:text-white'
-          }`}
+          onClick={() => openFileInputRef.current?.click()}
+          className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 text-[11px] font-semibold transition-all titlebar-no-drag"
           style={noDragStyle}
-          title="Editor Only"
+          title="Open Book, Comic, PDF, or Markdown File"
         >
-          <Edit3 className="w-3 h-3" />
-          <span>Editor</span>
+          <FolderOpen className="w-3 h-3" />
+          <span>Open</span>
         </button>
 
-        <button
-          onClick={() => setActiveMode('reader')}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
-            activeMode === 'reader' ? 'bg-primary text-black font-bold' : 'hover:text-white'
-          }`}
-          style={noDragStyle}
-          title="Distraction-Free Reader"
-        >
-          <BookOpen className="w-3 h-3" />
-          <span>Reader</span>
-        </button>
+        <nav className="flex items-center bg-black/50 p-0.5 rounded-lg border border-white/10 titlebar-no-drag" style={noDragStyle}>
+          <button
+            onClick={() => setActiveMode('split')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
+              activeMode === 'split' ? 'bg-primary text-black font-bold' : 'hover:text-white'
+            }`}
+            style={noDragStyle}
+            title="Split View (Editor + Live Reader)"
+          >
+            <Columns className="w-3 h-3" />
+            <span>Split</span>
+          </button>
 
-        <button
-          onClick={() => setActiveMode('pdf')}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
-            activeMode === 'pdf' ? 'bg-primary text-black font-bold' : 'hover:text-white'
-          }`}
-          style={noDragStyle}
-          title="PDF Document Reader"
-        >
-          <FileText className="w-3 h-3" />
-          <span>PDF</span>
-        </button>
+          <button
+            onClick={() => setActiveMode('editor')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
+              activeMode === 'editor' ? 'bg-primary text-black font-bold' : 'hover:text-white'
+            }`}
+            style={noDragStyle}
+            title="Editor Only"
+          >
+            <Edit3 className="w-3 h-3" />
+            <span>Editor</span>
+          </button>
 
-        <button
-          onClick={() => setActiveMode('booru')}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
-            activeMode === 'booru' ? 'bg-primary text-black font-bold' : 'hover:text-white'
-          }`}
-          style={noDragStyle}
-          title="Booru Wallpaper Browser"
-        >
-          <ImageIcon className="w-3 h-3" />
-          <span>Booru</span>
-        </button>
-      </nav>
+          <button
+            onClick={() => setActiveMode('reader')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
+              activeMode === 'reader' ? 'bg-primary text-black font-bold' : 'hover:text-white'
+            }`}
+            style={noDragStyle}
+            title="Distraction-Free Markdown Reader"
+          >
+            <BookOpen className="w-3 h-3" />
+            <span>Markdown</span>
+          </button>
+
+          <button
+            onClick={() => setActiveMode('epub')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
+              activeMode === 'epub' ? 'bg-primary text-black font-bold' : 'hover:text-white'
+            }`}
+            style={noDragStyle}
+            title="E-Book & Light Novel Reader (.epub, .fb2, .txt)"
+          >
+            <BookText className="w-3 h-3" />
+            <span>E-Book</span>
+          </button>
+
+          <button
+            onClick={() => setActiveMode('comic')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
+              activeMode === 'comic' ? 'bg-primary text-black font-bold' : 'hover:text-white'
+            }`}
+            style={noDragStyle}
+            title="Manga & Comic Reader (.cbz, .cbr, .zip, .rar)"
+          >
+            <Layers className="w-3 h-3" />
+            <span>Comic</span>
+          </button>
+
+          <button
+            onClick={() => setActiveMode('pdf')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
+              activeMode === 'pdf' ? 'bg-primary text-black font-bold' : 'hover:text-white'
+            }`}
+            style={noDragStyle}
+            title="PDF Document Reader"
+          >
+            <FileText className="w-3 h-3" />
+            <span>PDF</span>
+          </button>
+
+          <button
+            onClick={() => setActiveMode('booru')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-md text-[11px] transition-all titlebar-no-drag ${
+              activeMode === 'booru' ? 'bg-primary text-black font-bold' : 'hover:text-white'
+            }`}
+            style={noDragStyle}
+            title="Booru Wallpaper Browser"
+          >
+            <ImageIcon className="w-3 h-3" />
+            <span>Booru</span>
+          </button>
+        </nav>
+      </div>
 
       {/* Right Controls: Font Scaling, Streamer Toggle & Native Windows Controls */}
       <div className="flex items-center space-x-2 titlebar-no-drag" style={noDragStyle}>

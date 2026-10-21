@@ -25,7 +25,7 @@ async function createWindow() {
     minHeight: 600,
     frame: false,
     transparent: true,
-    backgroundMaterial: 'acrylic', // Windows 11 Acrylic blur
+    backgroundMaterial: 'mica', // Windows 11 Mica blur (replaces lagging acrylic)
     backgroundColor: '#00000000',
     show: false,
     webPreferences: {

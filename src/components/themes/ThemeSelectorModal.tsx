@@ -1,7 +1,7 @@
 import React from 'react';
 import { useThemeStore } from '../../stores/useThemeStore';
 import { FACTIONS, RE_ZERO_CHARACTERS } from '../../themes/characters.data';
-import { X, Search, Check, Sliders, Palette } from 'lucide-react';
+import { X, Search, Check, Sliders, Palette, Zap } from 'lucide-react';
 
 interface ThemeSelectorModalProps {
   isOpen: boolean;
@@ -20,6 +20,8 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({ isOpen, 
     setSelectedFaction,
     searchQuery,
     setSearchQuery,
+    performanceMode,
+    setPerformanceMode,
   } = useThemeStore();
 
   if (!isOpen) return null;
@@ -83,34 +85,62 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({ isOpen, 
               />
             </div>
 
-            {/* Wallpaper Sliders (Dim & Blur) */}
-            <div className="flex items-center space-x-6 w-full md:w-auto bg-black/30 px-4 py-2 rounded-xl border border-white/10">
-              <div className="flex items-center space-x-2">
-                <Sliders className="w-4 h-4 text-primary" />
-                <span className="text-xs text-textMuted whitespace-nowrap">Dim:</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="90"
-                  value={wallpaperDim}
-                  onChange={(e) => setWallpaperDim(Number(e.target.value))}
-                  className="w-20 accent-primary cursor-pointer"
-                />
-                <span className="text-xs font-mono text-slate-300 w-8">{wallpaperDim}%</span>
+            {/* Wallpaper Sliders (Dim & Blur) & Performance Mode */}
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <div className="flex items-center space-x-6 bg-black/30 px-4 py-2 rounded-xl border border-white/10">
+                <div className="flex items-center space-x-2">
+                  <Sliders className="w-4 h-4 text-primary" />
+                  <span className="text-xs text-textMuted whitespace-nowrap">Dim:</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="90"
+                    value={wallpaperDim}
+                    onChange={(e) => setWallpaperDim(Number(e.target.value))}
+                    className="w-20 accent-primary cursor-pointer"
+                  />
+                  <span className="text-xs font-mono text-slate-300 w-8">{wallpaperDim}%</span>
+                </div>
+
+                <div className="flex items-center space-x-2 border-l border-white/10 pl-4">
+                  <span className="text-xs text-textMuted whitespace-nowrap">Blur:</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="30"
+                    value={wallpaperBlur}
+                    onChange={(e) => setWallpaperBlur(Number(e.target.value))}
+                    className="w-20 accent-primary cursor-pointer"
+                  />
+                  <span className="text-xs font-mono text-slate-300 w-8">{wallpaperBlur}px</span>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-2 border-l border-white/10 pl-4">
-                <span className="text-xs text-textMuted whitespace-nowrap">Blur:</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="30"
-                  value={wallpaperBlur}
-                  onChange={(e) => setWallpaperBlur(Number(e.target.value))}
-                  className="w-20 accent-primary cursor-pointer"
-                />
-                <span className="text-xs font-mono text-slate-300 w-8">{wallpaperBlur}px</span>
-              </div>
+              {/* Performance Mode (Low-End GPU) Toggle */}
+              <button
+                type="button"
+                onClick={() => setPerformanceMode(!performanceMode)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-xl border text-xs font-medium transition-all ${
+                  performanceMode
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm'
+                    : 'bg-black/30 text-slate-400 border-white/10 hover:text-slate-200 hover:border-white/20'
+                }`}
+                title="Disable backdrop blur & effects to maximize FPS on low-end or integrated GPUs"
+              >
+                <Zap className={`w-3.5 h-3.5 ${performanceMode ? 'text-amber-400 fill-amber-400' : 'text-slate-400'}`} />
+                <span className="whitespace-nowrap">Performance Mode (Low-End GPU)</span>
+                <span
+                  className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ml-1 ${
+                    performanceMode ? 'bg-amber-500' : 'bg-white/20'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                      performanceMode ? 'translate-x-3.5' : 'translate-x-0.5'
+                    }`}
+                  />
+                </span>
+              </button>
             </div>
           </div>
 

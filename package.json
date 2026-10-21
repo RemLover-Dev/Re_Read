@@ -1,7 +1,7 @@
 {
   "name": "re-read",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -11,10 +11,12 @@
     "desktop": "node scripts/start-desktop.mjs",
     "desktop:electron": "node scripts/start-desktop.mjs",
     "desktop:tauri": "node scripts/run-tauri.mjs dev",
-    "test": "node --experimental-strip-types --test tests/characters-registry.test.mjs tests/bidi-query.test.mjs",
+    "test": "node --experimental-strip-types --test tests/characters-registry.test.mjs tests/bidi-query.test.mjs tests/viewer-zoom-modes.test.mjs tests/comic-ebook-parser.test.mjs tests/epub-parser.test.mjs",
     "tauri": "node scripts/run-tauri.mjs",
     "tauri:dev": "node scripts/run-tauri.mjs dev",
-    "tauri:build": "node scripts/run-tauri.mjs build"
+    "tauri:build": "node scripts/run-tauri.mjs build",
+    "release:check": "node scripts/check-release.mjs",
+    "release:icons": "node scripts/prepare-icons.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "^6.11.1",
@@ -28,8 +30,10 @@
     "@tauri-apps/plugin-fs": "^2.2.0",
     "@tauri-apps/plugin-shell": "^2.2.0",
     "clsx": "^2.1.1",
+    "fflate": "^0.8.3",
     "katex": "^0.16.21",
     "lucide-react": "^0.475.0",
+    "node-unrar-js": "^2.0.2",
     "pdfjs-dist": "^4.10.38",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -42,7 +46,8 @@
     "tailwind-merge": "^3.0.2",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@xmldom/xmldom": "^0.9.12"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
@@ -58,5 +63,6 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
     "vite": "^6.1.0"
-  }
+  },
+  "description": "BiDi Markdown, PDF, EPUB, comic and manga desktop reader"
 }
