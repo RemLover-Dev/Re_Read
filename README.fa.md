@@ -100,58 +100,6 @@ npm run tauri:build -- --bundles deb,appimage
 
 اگر گردش‌کار دیگری برای انتشار دارید، محرک‌های هم‌پوشان را ادغام یا حذف کنید تا یک تگ، دو فرایند انتشار موازی ایجاد نکند.
 
-## آماده‌سازی و push نسخهٔ ۰٫۲٫۰
-
-شمارهٔ نسخه در این چهار فایل باید یکسان باشد:
-
-- `package.json`
-- `package-lock.json` در ریشه و `packages[""].version`
-- `src-tauri/Cargo.toml`
-- `src-tauri/tauri.conf.json`
-
-این بسته هر چهار مورد را روی `0.2.0` تنظیم می‌کند. فایل‌های `README.md`، `README.fa.md` و `RELEASE_NOTES.md` را در همان commit انتشار نگه دارید. فایل `Cargo.lock` را نیز با Cargo به‌روزرسانی و commit کنید؛ اگر هنوز وجود ندارد، دستور زیر آن را تولید می‌کند.
-
-در PowerShell و پوشهٔ clone موجود:
-
-```powershell
-Set-Location -LiteralPath "E:\projects\RemLover-Dev\Rems Reader"
-npm ci
-npm run release:check
-npm test
-npm run build
-npm run release:icons
-cargo generate-lockfile --manifest-path src-tauri/Cargo.toml
-
-git status
-git diff
-```
-
-تغییرات، از جمله هر دو README و گردش‌کار، را مرور کنید. سپس فایل‌های انتشار را stage کنید:
-
-```powershell
-git add .github/workflows/build.yml README.md README.fa.md RELEASE_NOTES.md .gitignore package.json package-lock.json scripts/check-release.mjs scripts/prepare-icons.mjs scripts/collect-release.mjs scripts/release-icon.svg src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/tauri.conf.json src-tauri/src/window/vibrancy.rs src-tauri/icons
-```
-
-اصلاحات دلخواه EPUB و کمیک را که هنوز commit نشده‌اند نیز به commit انتشار اضافه کنید. سپس:
-
-```powershell
-git diff --cached --stat
-git diff --cached
-git commit -m "Release v0.2.0: Windows and Linux builds"
-git push origin HEAD
-```
-
-دستور `git push origin HEAD` شاخهٔ فعلی را ارسال می‌کند. اگر مخزن به pull request نیاز دارد، ابتدا آن را merge کنید و سپس تگ را روی commit نهایی انتشار بسازید:
-
-```powershell
-git tag -a v0.2.0 -m "Re:Read v0.2.0"
-git push origin v0.2.0
-```
-
-push تگ، ساخت نسخهٔ انتشار را آغاز می‌کند. تگ را فقط یک‌بار بسازید. اگر قبلاً وجود دارد، ابتدا تگ و Release موجود را بررسی کنید. تگ نسخهٔ منتشرشده را force-push نکنید.
-
-برای نسخه‌های بعدی، هر چهار فایل نسخه، هر دو README و یادداشت انتشار را تغییر دهید؛ پس از تغییر `package.json`، دستور `npm install --package-lock-only` را اجرا و بررسی‌ها را تکرار کنید.
-
 ## ساختار پروژه
 
 - `src/components/`: بخش‌های Markdown، PDF، EPUB، کمیک و کنترل‌های مشترک.
