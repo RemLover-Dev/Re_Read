@@ -100,58 +100,6 @@ The workflow installs Linux native dependencies and uses Node 24, Rust stable, `
 
 If another workflow already builds or publishes releases, merge or remove the overlapping triggers so one tag does not run duplicate release pipelines.
 
-## Prepare and push v0.2.0
-
-The release number must match in all four files:
-
-- `package.json`
-- `package-lock.json` (root and `packages[""].version`)
-- `src-tauri/Cargo.toml`
-- `src-tauri/tauri.conf.json`
-
-They are set to `0.2.0` in this update. Keep `README.md`, `README.fa.md` and `RELEASE_NOTES.md` in the same release commit. If `Cargo.lock` is already tracked, let Cargo update it and commit it too; otherwise generate and commit it with `cargo generate-lockfile --manifest-path src-tauri/Cargo.toml` for reproducible Rust resolution.
-
-From PowerShell in your existing clone:
-
-```powershell
-Set-Location -LiteralPath "E:\projects\RemLover-Dev\Rems Reader"
-npm ci
-npm run release:check
-npm test
-npm run build
-npm run release:icons
-cargo generate-lockfile --manifest-path src-tauri/Cargo.toml
-
-git status
-git diff
-```
-
-Review the changed files, including both READMEs and the workflow. Stage the release configuration explicitly:
-
-```powershell
-git add .github/workflows/build.yml README.md README.fa.md RELEASE_NOTES.md .gitignore package.json package-lock.json scripts/check-release.mjs scripts/prepare-icons.mjs scripts/collect-release.mjs scripts/release-icon.svg src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/tauri.conf.json src-tauri/src/window/vibrancy.rs src-tauri/icons
-```
-
-Commit any intended EPUB/comic fixes that are still uncommitted as part of this release too, then check the staged changes and push:
-
-```powershell
-git diff --cached --stat
-git diff --cached
-git commit -m "Release v0.2.0: Windows and Linux builds"
-git push origin HEAD
-```
-
-`git push origin HEAD` pushes your current branch. If your repository requires a pull request, merge it before creating the version tag. On the final release commit:
-
-```powershell
-git tag -a v0.2.0 -m "Re:Read v0.2.0"
-git push origin v0.2.0
-```
-
-The tag push triggers the release build. Create the tag only once; if it already exists, inspect the existing tag and release before choosing a new version. Never force-push an existing published version tag.
-
-For future versions, update the four version files, both READMEs and release notes, run `npm install --package-lock-only` after editing `package.json`, and rerun the release checks.
-
 ## Project layout
 
 - `src/components/`: Markdown, PDF, EPUB, comic readers and shared controls.
