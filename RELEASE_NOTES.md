@@ -1,15 +1,31 @@
 # Re:Read v0.2.0
 
-- Windows x64 installers: NSIS setup EXE and MSI.
-- Linux x64 packages: AppImage and Debian DEB.
-- Comic ZIP/CBZ and RAR/CBR loading fixes, natural page ordering, original image bytes, improved fit/zoom and stable spread navigation.
-- EPUB text visibility fixes, first-text-chapter opening, EPUB 2/3 nested contents, exact chapter paths and fragment navigation.
-- Synchronized application versions and updated English/Persian setup and release instructions.
+## What's New in v0.2.0
 
-Windows Mica effects are Windows-specific. EPUB content reflows with reader typography. DRM-protected EPUBs are not supported.
+### 📖 E-Book & Light Novel Reader
+- Native reading support for `.epub`, `.fb2`, `.fb2.zip`, and `.txt` files.
+- Interactive Table of Contents (TOC) drawer with nested navigation and fragment support.
+- Typography customization: font sizing, line height, font family, and margins.
+- Automatic opening at the first reading chapter, skipping cover/blank pages.
+- Full RTL and BiDi support for Persian and Arabic text alongside standard LTR.
 
-Choose the installer for your platform under Assets. Each platform includes a SHA-256 checksum file. These installers are unsigned unless the maintainer configures signing before the build.
+### 📚 Comic & Manga Reader
+- Archive support for `.cbz`, `.cbr`, `.zip`, and `.rar` formats.
+- Dual-page spread layout with Manga (RTL) and Western Comic (LTR) modes.
+- Continuous vertical strip view for Webtoons.
+- Automatic `ComicInfo.xml` inspection for metadata and reading direction detection.
+- Natural alphanumeric filename ordering preserving original image quality.
 
----
+### 🤏 Touchpad Pinch-to-Zoom & Navigation
+- Smooth touchpad pinch-to-zoom powered by native Windows DirectManipulation (`ICoreWebView2Settings5`).
+- 2D panning with mouse drag, spacebar, middle-click, or hand tool.
+- Smart zoom clamping and cursor-centered magnification.
 
-نسخهٔ ۰٫۲٫۰ شامل نصب‌کننده‌های ویندوز و لینوکس، اصلاح پردازش کمیک و EPUB، بهبود نمایش متن و تصویر، و راهنمای انتشار به زبان فارسی و انگلیسی است.
+### ⚡ Performance & Appearance
+- Windows 11 native Mica backdrop effect with high contrast and dark mode support.
+- Performance Mode toggle to bypass DWM compositor overhead during heavy reading sessions.
+
+### 📦 Platform Installers & Binaries
+- **Windows (x64)**: Setup installer (`.exe` NSIS) and Windows Installer package (`.msi`).
+- **Linux (x64)**: Standalone `.AppImage` and Debian package (`.deb`).
+- SHA-256 checksums provided for all release artifacts.
