@@ -7,3 +7,8 @@ src-tauri/target/
 release-artifacts/
 release-assets/
 *.log
+
+# Local agent tooling / generated dumps (never commit)
+multi_agent.py
+Gemini_Dump.txt
+
