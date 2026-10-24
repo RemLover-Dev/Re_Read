@@ -88,7 +88,7 @@ jobs:
           pattern: ReRead-*-x64
           path: release-assets
           merge-multiple: true
-      - name: Create or update the draft after both builds succeed
+      - name: Create or publish release after both builds succeed
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,7 +102,7 @@ jobs:
               exit 1
             fi
             gh release upload "$RELEASE_TAG" release-assets/* --clobber
-            gh release edit "$RELEASE_TAG" --title "Re:Read $RELEASE_TAG" --notes-file RELEASE_NOTES.md
+            gh release edit "$RELEASE_TAG" --draft=false --latest --title "Re:Read $RELEASE_TAG" --notes-file RELEASE_NOTES.md
           else
-            gh release create "$RELEASE_TAG" release-assets/* --verify-tag --draft --title "Re:Read $RELEASE_TAG" --notes-file RELEASE_NOTES.md
+            gh release create "$RELEASE_TAG" release-assets/* --verify-tag --latest --title "Re:Read $RELEASE_TAG" --notes-file RELEASE_NOTES.md
           fi
