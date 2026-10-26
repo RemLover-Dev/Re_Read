@@ -82,7 +82,7 @@ Outputs are under `src-tauri/target/release/bundle/`:
 | Platform / architecture | Packages | Bundle subdirectories |
 | --- | --- | --- |
 | Windows x64 | NSIS setup `.exe`, `.msi` | `nsis/`, `msi/` |
-| Linux x64 | `.AppImage`, `.deb` | `appimage/`, `deb/` |
+| Linux x64 | `.deb` | `deb/` |
 
 Existing icons are kept. If binary icons are missing, `release:icons` generates them from `app-icon.svg`, then `public/logo.svg`, or the included fallback `scripts/release-icon.svg`. Commit your preferred artwork and generated `src-tauri/icons/` files. Windows Mica effects are specific to Windows; Linux uses the reader's regular themed appearance.
 

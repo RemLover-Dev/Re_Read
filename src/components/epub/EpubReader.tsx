@@ -19,6 +19,15 @@ import {
   RotateCcw,
 } from 'lucide-react';
 
+export type EpubFont = 'sans' | 'serif' | 'persian' | 'mono';
+
+const EPUB_FONTS: Record<EpubFont, { label: string; fontCss: string }> = {
+  sans: { label: 'Modern Sans', fontCss: 'var(--font-english), var(--font-persian), sans-serif' },
+  serif: { label: 'Book Serif', fontCss: 'var(--font-serif), Georgia, Cambria, serif' },
+  persian: { label: 'Vazirmatn (BiDi)', fontCss: 'var(--font-persian), var(--font-english), sans-serif' },
+  mono: { label: 'JetBrains Mono', fontCss: 'var(--font-mono), monospace' },
+};
+
 export const EpubReader: React.FC = () => {
   const { epubBook, epubFileName, openFileFromBytes, fontScale, setFontScale } = useWorkspaceStore();
   const { currentCharacter } = useThemeStore();
@@ -29,12 +38,16 @@ export const EpubReader: React.FC = () => {
   const [currentChapterIndex, setCurrentChapterIndex] = useState<number>(0);
   const [isTocOpen, setIsTocOpen] = useState<boolean>(false);
   const [readingLayout, setReadingLayout] = useState<'scroll' | 'columns'>('scroll');
-  const [lineHeight, setLineHeight] = useState<number>(1.8);
-  const [maxContentWidth, setMaxContentWidth] = useState<number>(768); // px
+  const [selectedFont, setSelectedFont] = useState<EpubFont>('sans');
+  const [fontWeight, setFontWeight] = useState<number>(400);
+  const [lineHeight, setLineHeight] = useState<number>(1.75);
+  const [maxContentWidth, setMaxContentWidth] = useState<number>(960); // px
   const [zoom, setZoom] = useState<number>(1.0);
   const [isHandTool, setIsHandTool] = useState<boolean>(false);
   const [chapterAnchor, setChapterAnchor] = useState({ id: '', request: 0 });
+  const [readProgress, setReadProgress] = useState<number>(0);
   const chapterContentRef = useRef<HTMLDivElement>(null);
+
   const tocEntries = useMemo(() => {
     const flatten = (items: EpubTocItem[], depth = 0): { item: EpubTocItem; depth: number }[] =>
       items.flatMap((item) => [{ item, depth }, ...flatten(item.children || [], depth + 1)]);
@@ -47,6 +60,7 @@ export const EpubReader: React.FC = () => {
     setChapterAnchor((previous) => ({ id: '', request: previous.request + 1 }));
     setZoom(1);
     setIsTocOpen(false);
+    setReadProgress(0);
   }, [epubBook]);
 
   // ZoomableView owns the scroll viewport; scrolling its outer wrapper has no effect.
@@ -57,18 +71,55 @@ export const EpubReader: React.FC = () => {
       ? Array.from(chapterContentRef.current?.querySelectorAll('[id]') || [])
         .find((element) => element.id === chapterAnchor.id)
       : undefined;
-    if (anchor) viewport.scrollTop += anchor.getBoundingClientRect().top - viewport.getBoundingClientRect().top - 24;
-    else viewport.scrollTo({ top: 0, left: 0 });
+    if (anchor) {
+      viewport.scrollTop += anchor.getBoundingClientRect().top - viewport.getBoundingClientRect().top - 24;
+    } else {
+      viewport.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
   }, [currentChapterIndex, chapterAnchor, epubBook]);
 
   const activeChapter = epubBook?.chapters[currentChapterIndex];
   const totalChapters = epubBook?.chapters.length || 0;
+
+  // Track smooth scroll progress for the scrubber
+  useEffect(() => {
+    const container = zoomRef.current?.getContainer();
+    if (!container) return;
+
+    const handleScroll = () => {
+      const maxScroll = container.scrollHeight - container.clientHeight;
+      if (maxScroll <= 0) {
+        setReadProgress(0);
+        return;
+      }
+      const current = Math.min(100, Math.max(0, (container.scrollTop / maxScroll) * 100));
+      setReadProgress(current);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [currentChapterIndex, activeChapter]);
+
+  const handleScrubChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    setReadProgress(val);
+    const container = zoomRef.current?.getContainer();
+    if (!container) return;
+    const maxScroll = container.scrollHeight - container.clientHeight;
+    container.scrollTo({
+      top: (val / 100) * maxScroll,
+      behavior: 'smooth',
+    });
+  };
+
   const navigateToChapter = useCallback((index: number, fragment = '') => {
     setCurrentChapterIndex(Math.max(0, Math.min(totalChapters - 1, index)));
     setChapterAnchor((previous) => ({ id: fragment, request: previous.request + 1 }));
   }, [totalChapters]);
+
   const goToNextChapter = () => navigateToChapter(currentChapterIndex + 1);
   const goToPrevChapter = () => navigateToChapter(currentChapterIndex - 1);
+
   const handleChapterClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const link = (event.target as Element).closest('a[data-epub-href]');
     if (!link) return;
@@ -129,7 +180,7 @@ export const EpubReader: React.FC = () => {
           Open an <span className="text-primary font-mono font-semibold">.epub</span>,{' '}
           <span className="text-primary font-mono font-semibold">.fb2</span>, or{' '}
           <span className="text-primary font-mono font-semibold">.txt</span> web novel with full BiDi
-          Persian/English typography, chapter TOC, and illustration viewing.
+          Persian/English typography, chapter TOC, two-page spread layouts, and smooth reading.
         </p>
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -153,12 +204,12 @@ export const EpubReader: React.FC = () => {
       />
 
       {/* Top E-Book Navigation & Controls Bar */}
-      <header className="h-12 shrink-0 px-4 border-b border-white/10 bg-black/60 flex items-center justify-between text-xs text-slate-300 z-30">
+      <header className="h-11 shrink-0 px-3 border-b border-white/10 bg-black/70 backdrop-blur-xl flex items-center justify-between text-xs text-slate-300 z-30 gap-2">
         {/* Left: TOC Sidebar Toggle & Book Title */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5 min-w-0">
           <button
             onClick={() => setIsTocOpen((prev) => !prev)}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border transition-all ${
+            className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg border transition-all ${
               isTocOpen
                 ? 'bg-primary text-black font-bold border-primary shadow-sm'
                 : 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-200'
@@ -166,19 +217,19 @@ export const EpubReader: React.FC = () => {
             title="Toggle Table of Contents (T)"
           >
             <List className="w-3.5 h-3.5" />
-            <span>Contents</span>
+            <span className="hidden sm:inline">Contents</span>
           </button>
 
-          <div className="flex items-center space-x-2 truncate max-w-xs sm:max-w-md">
-            <span className="font-bold text-white truncate">{epubBook.title || epubFileName}</span>
+          <div className="flex items-center space-x-1.5 truncate max-w-xs md:max-w-sm lg:max-w-md">
+            <span className="font-bold text-white truncate text-xs">{epubBook.title || epubFileName}</span>
             {epubBook.author && (
-              <span className="text-textMuted text-[11px] truncate">by {epubBook.author}</span>
+              <span className="text-textMuted text-[10px] truncate hidden md:inline">by {epubBook.author}</span>
             )}
           </div>
         </div>
 
         {/* Center: Chapter Stepper */}
-        <div className="flex items-center space-x-2 bg-black/40 px-2 py-1 rounded-xl border border-white/10">
+        <div className="flex items-center space-x-1.5 bg-black/50 px-2 py-0.5 rounded-lg border border-white/10 shrink-0">
           <button
             onClick={goToPrevChapter}
             disabled={currentChapterIndex === 0}
@@ -187,7 +238,7 @@ export const EpubReader: React.FC = () => {
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
-          <span className="text-xs font-mono font-medium text-slate-200 whitespace-nowrap">
+          <span className="text-xs font-mono font-medium text-slate-200 whitespace-nowrap epub-numbers-legible">
             {currentChapterIndex + 1} / {totalChapters}
           </span>
           <button
@@ -200,9 +251,9 @@ export const EpubReader: React.FC = () => {
           </button>
         </div>
 
-        {/* Right: Typography & Layout Controls */}
-        <div className="flex items-center space-x-2">
-          {/* Layout Toggle (Scroll vs Multi-Column) */}
+        {/* Right: Typography, Layout & Numeric Inputs */}
+        <div className="flex items-center space-x-2 shrink-0">
+          {/* Layout Toggle (Continuous Scroll vs Two-Page Spread) */}
           <div className="flex items-center bg-white/5 p-0.5 rounded-lg border border-white/10">
             <button
               onClick={() => setReadingLayout('scroll')}
@@ -218,11 +269,54 @@ export const EpubReader: React.FC = () => {
               className={`p-1.5 rounded transition-colors ${
                 readingLayout === 'columns' ? 'bg-primary text-black font-bold' : 'text-slate-400 hover:text-white'
               }`}
-              title="Two-Column Book Mode"
+              title="Two-Page Spread (Book Mode with monitor adaptation)"
             >
               <Columns className="w-3.5 h-3.5" />
             </button>
           </div>
+
+          {/* Numeric Input: Font Weight */}
+          <div className="flex items-center space-x-1 bg-white/5 px-2 py-0.5 rounded-lg border border-white/10" title="Font Weight (100 - 900)">
+            <span className="text-[10px] text-slate-400 font-medium select-none">Weight:</span>
+            <input
+              type="number"
+              min="100"
+              max="900"
+              step="50"
+              value={fontWeight}
+              onChange={(e) => setFontWeight(Math.min(900, Math.max(100, Number(e.target.value) || 400)))}
+              className="w-12 bg-black/60 text-white font-mono text-[11px] px-1 py-0.5 rounded border border-white/15 focus:border-primary outline-none text-center epub-numbers-legible"
+            />
+          </div>
+
+          {/* Numeric Input: Content Width */}
+          <div className="flex items-center space-x-1 bg-white/5 px-2 py-0.5 rounded-lg border border-white/10" title="Reading Width in pixels">
+            <span className="text-[10px] text-slate-400 font-medium select-none">Width:</span>
+            <input
+              type="number"
+              min="400"
+              max="3000"
+              step="50"
+              value={maxContentWidth}
+              onChange={(e) => setMaxContentWidth(Math.min(3000, Math.max(400, Number(e.target.value) || 960)))}
+              className="w-14 bg-black/60 text-white font-mono text-[11px] px-1 py-0.5 rounded border border-white/15 focus:border-primary outline-none text-center epub-numbers-legible"
+            />
+            <span className="text-[9px] text-slate-400 font-mono">px</span>
+          </div>
+
+          {/* Font Family Selector */}
+          <select
+            value={selectedFont}
+            onChange={(e) => setSelectedFont(e.target.value as EpubFont)}
+            className="bg-white/5 border border-white/10 text-slate-200 text-xs rounded-lg px-2 py-1 outline-none focus:border-primary hover:bg-white/10 transition-colors"
+            title="Reading Font Family"
+          >
+            {Object.entries(EPUB_FONTS).map(([key, item]) => (
+              <option key={key} value={key} className="bg-slate-900 text-white">
+                {item.label}
+              </option>
+            ))}
+          </select>
 
           {/* Hand Tool Toggle */}
           <button
@@ -238,27 +332,29 @@ export const EpubReader: React.FC = () => {
           </button>
 
           {/* Zoom Buttons */}
-          <button
-            onClick={() => zoomRef.current?.zoomOut()}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-colors"
-            title="Zoom Out"
-          >
-            <ZoomOut className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => zoomRef.current?.resetZoom()}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-colors"
-            title="Reset Zoom"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => zoomRef.current?.zoomIn()}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-colors"
-            title="Zoom In"
-          >
-            <ZoomIn className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center space-x-0.5 bg-white/5 p-0.5 rounded-lg border border-white/10">
+            <button
+              onClick={() => zoomRef.current?.zoomOut()}
+              className="p-1 rounded hover:bg-white/10 text-slate-300 transition-colors"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => zoomRef.current?.resetZoom()}
+              className="p-1 rounded hover:bg-white/10 text-slate-300 transition-colors"
+              title="Reset Zoom"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => zoomRef.current?.zoomIn()}
+              className="p-1 rounded hover:bg-white/10 text-slate-300 transition-colors"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-3 h-3" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -268,7 +364,7 @@ export const EpubReader: React.FC = () => {
         {isTocOpen && (
           <aside className="w-80 shrink-0 h-full border-r border-white/10 bg-black/80 backdrop-blur-2xl flex flex-col z-20 animate-fade-in shadow-2xl">
             {/* Book Header in Sidebar */}
-            <div className="p-4 border-b border-white/10 flex items-center space-x-3">
+            <div className="p-3.5 border-b border-white/10 flex items-center space-x-3">
               {epubBook.coverUrl ? (
                 <img
                   src={epubBook.coverUrl}
@@ -281,32 +377,35 @@ export const EpubReader: React.FC = () => {
                 </div>
               )}
               <div className="overflow-hidden">
-                <h3 className="text-sm font-bold text-white truncate">{epubBook.title}</h3>
+                <h3 className="text-xs font-bold text-white truncate">{epubBook.title}</h3>
                 {epubBook.author && (
-                  <p className="text-xs text-textMuted truncate">{epubBook.author}</p>
+                  <p className="text-[11px] text-textMuted truncate">{epubBook.author}</p>
                 )}
-                <span className="text-[10px] font-mono text-slate-400">
+                <span className="text-[10px] font-mono text-slate-400 epub-numbers-legible">
                   {totalChapters} chapters
                 </span>
               </div>
             </div>
 
             {/* Typography Customization Drawer Panel */}
-            <div className="p-3 border-b border-white/10 bg-white/5 space-y-2 text-xs">
+            <div className="p-3 border-b border-white/10 bg-white/5 space-y-2.5 text-xs">
               <div className="flex items-center justify-between text-slate-300 font-medium">
                 <span className="flex items-center space-x-1">
                   <Type className="w-3 h-3 text-primary" />
-                  <span>Typography</span>
+                  <span>Typography Controls</span>
                 </span>
-                <span className="font-mono text-[10px] text-primary">{Math.round(fontScale * 100)}%</span>
+                <span className="font-mono text-[10px] text-primary epub-numbers-legible">
+                  {Math.round(fontScale * 100)}%
+                </span>
               </div>
 
+              {/* Font Scale Slider */}
               <div className="flex items-center space-x-2">
-                <span className="text-[11px] text-slate-400 w-12">Font:</span>
+                <span className="text-[11px] text-slate-400 w-14">Scale:</span>
                 <input
                   type="range"
                   min="0.7"
-                  max="1.8"
+                  max="2.0"
                   step="0.05"
                   value={fontScale}
                   onChange={(e) => setFontScale(Number(e.target.value))}
@@ -314,30 +413,55 @@ export const EpubReader: React.FC = () => {
                 />
               </div>
 
+              {/* Font Weight Slider + Number */}
               <div className="flex items-center space-x-2">
-                <span className="text-[11px] text-slate-400 w-12">Height:</span>
+                <span className="text-[11px] text-slate-400 w-14">Weight:</span>
                 <input
                   type="range"
-                  min="1.4"
-                  max="2.4"
-                  step="0.1"
+                  min="100"
+                  max="900"
+                  step="50"
+                  value={fontWeight}
+                  onChange={(e) => setFontWeight(Number(e.target.value))}
+                  className="w-full accent-primary h-1 bg-white/20 rounded cursor-pointer"
+                />
+                <span className="font-mono text-[10px] text-slate-300 w-8 text-right epub-numbers-legible">
+                  {fontWeight}
+                </span>
+              </div>
+
+              {/* Line Height Slider */}
+              <div className="flex items-center space-x-2">
+                <span className="text-[11px] text-slate-400 w-14">Height:</span>
+                <input
+                  type="range"
+                  min="1.3"
+                  max="2.5"
+                  step="0.05"
                   value={lineHeight}
                   onChange={(e) => setLineHeight(Number(e.target.value))}
                   className="w-full accent-primary h-1 bg-white/20 rounded cursor-pointer"
                 />
+                <span className="font-mono text-[10px] text-slate-300 w-8 text-right epub-numbers-legible">
+                  {lineHeight.toFixed(2)}
+                </span>
               </div>
 
+              {/* Max Content Width Slider */}
               <div className="flex items-center space-x-2">
-                <span className="text-[11px] text-slate-400 w-12">Width:</span>
+                <span className="text-[11px] text-slate-400 w-14">Width:</span>
                 <input
                   type="range"
-                  min="500"
-                  max="1200"
+                  min="400"
+                  max="2800"
                   step="50"
                   value={maxContentWidth}
                   onChange={(e) => setMaxContentWidth(Number(e.target.value))}
                   className="w-full accent-primary h-1 bg-white/20 rounded cursor-pointer"
                 />
+                <span className="font-mono text-[10px] text-slate-300 w-8 text-right epub-numbers-legible">
+                  {maxContentWidth}
+                </span>
               </div>
             </div>
 
@@ -348,12 +472,12 @@ export const EpubReader: React.FC = () => {
                 return (
                   <button
                     key={`${item.id}-${idx}`}
-                    style={{ paddingLeft: `${12 + depth * 16}px` }}
+                    style={{ paddingLeft: `${12 + depth * 14}px` }}
                     onClick={() => {
                       navigateToChapter(item.chapterIndex, item.fragment);
                       if (window.innerWidth < 768) setIsTocOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between ${
+                    className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs transition-all flex items-center justify-between ${
                       isActive
                         ? 'bg-primary text-black font-bold shadow-md'
                         : 'text-slate-300 hover:bg-white/10 hover:text-white'
@@ -361,7 +485,7 @@ export const EpubReader: React.FC = () => {
                   >
                     <span className="truncate pr-2">{item.title}</span>
                     <span
-                      className={`text-[10px] font-mono whitespace-nowrap ${
+                      className={`text-[10px] font-mono whitespace-nowrap epub-numbers-legible ${
                         isActive ? 'text-black/70' : 'text-slate-500'
                       }`}
                     >
@@ -375,7 +499,7 @@ export const EpubReader: React.FC = () => {
         )}
 
         {/* Chapter Viewport wrapped in ZoomableView */}
-        <div className="flex-1 min-w-0 h-full overflow-hidden relative">
+        <div className="flex-1 min-w-0 h-full overflow-hidden relative flex flex-col">
           <ZoomableView
             ref={zoomRef}
             zoom={zoom}
@@ -385,12 +509,13 @@ export const EpubReader: React.FC = () => {
             minZoom={0.4}
             maxZoom={3.0}
             showHud={false}
-            className="h-full w-full"
-            contentClassName="py-10 px-6 sm:px-12 flex justify-center"
+            scrollSmooth={true}
+            className="h-full w-full flex-1"
+            contentClassName="py-3 sm:py-6 px-1 sm:px-4 flex justify-center"
           >
             {activeChapter ? (
               <div
-                className={`rounded-2xl p-6 sm:p-12 shadow-2xl border transition-all duration-300 w-full ${
+                className={`rounded-2xl p-4 sm:p-8 lg:p-10 shadow-2xl border transition-all duration-300 w-full ${
                   isHandTool ? 'select-none pointer-events-none' : 'select-text pointer-events-auto'
                 }`}
                 style={{
@@ -398,11 +523,13 @@ export const EpubReader: React.FC = () => {
                   backgroundColor: currentCharacter.palette.surface,
                   borderColor: currentCharacter.palette.borderGlow,
                   fontSize: `${16 * fontScale}px`,
+                  fontWeight: fontWeight,
                   lineHeight: `${lineHeight}`,
+                  fontFamily: EPUB_FONTS[selectedFont].fontCss,
                 }}
               >
                 {/* Chapter Heading */}
-                <h1 className="text-2xl sm:text-3xl font-bold mb-8 pb-4 border-b border-white/10 text-primary tracking-wide">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-6 pb-3 border-b border-white/10 text-primary tracking-wide epub-numbers-legible">
                   {activeChapter.title}
                 </h1>
 
@@ -410,43 +537,66 @@ export const EpubReader: React.FC = () => {
                 <div
                   ref={chapterContentRef}
                   onClick={handleChapterClick}
-                  className={`epub-chapter-content re-read-content text-slate-100 ${
-                    readingLayout === 'columns'
-                      ? 'columns-1 md:columns-2 gap-10 [column-rule:1px_solid_rgba(255,255,255,0.1)]'
-                      : ''
+                  className={`epub-chapter-content re-read-content epub-numbers-legible text-slate-100 ${
+                    readingLayout === 'columns' ? 'epub-two-page-spread' : ''
                   }`}
+                  style={{
+                    fontWeight: fontWeight,
+                    fontFamily: EPUB_FONTS[selectedFont].fontCss,
+                  }}
                   dangerouslySetInnerHTML={{ __html: activeChapter.content }}
                 />
 
                 {/* Bottom Navigation Buttons */}
-                <div className="mt-16 pt-8 border-t border-white/10 flex items-center justify-between text-sm">
+                <div className="mt-12 pt-6 border-t border-white/10 flex items-center justify-between text-sm">
                   <button
                     onClick={goToPrevChapter}
                     disabled={currentChapterIndex === 0}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 disabled:opacity-20 disabled:pointer-events-none transition-all text-slate-300 hover:text-white"
+                    className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 disabled:opacity-20 disabled:pointer-events-none transition-all text-slate-300 hover:text-white text-xs"
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-3.5 h-3.5" />
                     <span>Previous Chapter</span>
                   </button>
 
-                  <span className="text-xs font-mono text-textMuted">
+                  <span className="text-xs font-mono text-textMuted epub-numbers-legible">
                     Chapter {currentChapterIndex + 1} of {totalChapters}
                   </span>
 
                   <button
                     onClick={goToNextChapter}
                     disabled={currentChapterIndex >= totalChapters - 1}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-primary text-black font-bold hover:opacity-90 disabled:opacity-20 disabled:pointer-events-none transition-all shadow-lg shadow-primary/20"
+                    className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-black font-bold hover:opacity-90 disabled:opacity-20 disabled:pointer-events-none transition-all shadow-lg shadow-primary/20 text-xs"
                   >
                     <span>Next Chapter</span>
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
             ) : null}
           </ZoomableView>
+
+          {/* Smooth Reading Scrubber Bar */}
+          <footer className="h-8 shrink-0 px-4 bg-black/80 backdrop-blur-md border-t border-white/10 flex items-center space-x-3 text-xs text-slate-300 z-20">
+            <span className="text-[10px] font-mono text-slate-400 select-none whitespace-nowrap">
+              Scrub:
+            </span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value={readProgress}
+              onChange={handleScrubChange}
+              className="flex-1 accent-primary h-1.5 bg-white/15 rounded-lg cursor-pointer hover:h-2 transition-all"
+              title="Smooth Chapter Scrubber"
+            />
+            <span className="text-[11px] font-mono text-primary font-semibold w-12 text-right select-none epub-numbers-legible">
+              {readProgress.toFixed(1)}%
+            </span>
+          </footer>
         </div>
       </div>
     </div>
   );
 };
+

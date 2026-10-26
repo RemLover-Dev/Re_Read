@@ -88,7 +88,7 @@ export const App: React.FC = () => {
 
       {/* Main Workspace Content */}
       <main className="flex-1 w-full overflow-hidden relative flex">
-        {activeMode === 'split' && (
+        <div className={`h-full w-full overflow-hidden ${activeMode === 'split' ? 'block' : 'hidden'}`}>
           <div className="h-full w-full flex overflow-hidden">
             {/* Left Pane: CodeMirror Markdown Editor */}
             <div
@@ -117,46 +117,36 @@ export const App: React.FC = () => {
               <MarkdownReader />
             </div>
           </div>
-        )}
+        </div>
 
-        {activeMode === 'editor' && (
+        <div className={`h-full w-full overflow-hidden ${activeMode === 'editor' ? 'block' : 'hidden'}`}>
           <div className="h-full w-full flex flex-col">
             <EditorToolbar />
             <div className="flex-1 overflow-hidden">
               <CodeMirrorEditor />
             </div>
           </div>
-        )}
+        </div>
 
-        {activeMode === 'reader' && (
-          <div className="h-full w-full overflow-hidden">
-            <MarkdownReader />
-          </div>
-        )}
+        <div className={`h-full w-full overflow-hidden ${activeMode === 'reader' ? 'block' : 'hidden'}`}>
+          <MarkdownReader />
+        </div>
 
-        {activeMode === 'pdf' && (
-          <div className="h-full w-full overflow-hidden">
-            <PDFViewer />
-          </div>
-        )}
+        <div className={`h-full w-full overflow-hidden ${activeMode === 'pdf' ? 'block' : 'hidden'}`}>
+          <PDFViewer />
+        </div>
 
-        {activeMode === 'comic' && (
-          <div className="h-full w-full overflow-hidden">
-            <ComicReader />
-          </div>
-        )}
+        <div className={`h-full w-full overflow-hidden ${activeMode === 'comic' ? 'block' : 'hidden'}`}>
+          <ComicReader />
+        </div>
 
-        {activeMode === 'epub' && (
-          <div className="h-full w-full overflow-hidden">
-            <EpubReader />
-          </div>
-        )}
+        <div className={`h-full w-full overflow-hidden ${activeMode === 'epub' ? 'block' : 'hidden'}`}>
+          <EpubReader />
+        </div>
 
-        {activeMode === 'booru' && (
-          <div className="h-full w-full overflow-hidden">
-            <BooruBrowser />
-          </div>
-        )}
+        <div className={`h-full w-full overflow-hidden ${activeMode === 'booru' ? 'block' : 'hidden'}`}>
+          <BooruBrowser />
+        </div>
       </main>
 
       {/* Drag & Drop Visual Overlay */}

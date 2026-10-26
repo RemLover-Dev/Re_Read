@@ -32,7 +32,40 @@
   --pdf-filter: invert(0.92) hue-rotate(200deg) brightness(0.96);
   --font-persian: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
   --font-english: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', sans-serif;
+  --font-serif: 'Lora', 'Georgia', 'Merriweather', 'Cambria', serif;
   --font-mono: 'JetBrains Mono', Consolas, monospace;
+}
+
+/* Numeric legibility optimization for EPUB and reader numbers */
+.epub-numbers-legible {
+  font-variant-numeric: tabular-nums lining-nums;
+  -moz-font-feature-settings: 'tnum' 1, 'lnum' 1;
+  -webkit-font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+}
+
+/* Two-page spread layout with responsive adaptation across monitor sizes */
+.epub-two-page-spread {
+  column-count: 2;
+  column-gap: 3.5rem;
+  column-rule: 1px solid rgba(255, 255, 255, 0.12);
+  orphans: 2;
+  widows: 2;
+  text-align: justify;
+}
+
+@media (max-width: 960px) {
+  .epub-two-page-spread {
+    column-count: 1;
+    column-rule: none;
+    text-align: start;
+  }
+}
+
+@media (min-width: 1920px) {
+  .epub-two-page-spread {
+    column-gap: 5rem;
+  }
 }
 
 /* Custom Scrollbar for Glass Aesthetic */

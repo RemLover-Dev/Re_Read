@@ -29,7 +29,7 @@ jobs:
             bundles: nsis,msi
           - os: ubuntu-22.04
             label: Linux
-            bundles: deb,appimage
+            bundles: deb
     env:
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
     steps:

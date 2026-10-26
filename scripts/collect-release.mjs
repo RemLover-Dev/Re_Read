@@ -3,7 +3,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 const platform = process.platform === 'win32' ? 'Windows' : process.platform === 'linux' ? 'Linux' : null;
 if (!platform) throw new Error('Release collection supports Windows and Linux.');
-const extensions = platform === 'Windows' ? ['.exe', '.msi'] : ['.deb', '.AppImage'];
+const extensions = platform === 'Windows' ? ['.exe', '.msi'] : ['.deb'];
 const root = 'src-tauri/target/release/bundle';
 function walk(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

@@ -24,6 +24,7 @@ export interface ZoomableViewProps {
   centered?: boolean;
   enableTouchpadPinch?: boolean;
   enableMousePan?: boolean;
+  scrollSmooth?: boolean;
   /** Children provide their own pixel dimensions at the requested zoom. */
   scaleContent?: boolean;
 }
@@ -70,6 +71,7 @@ export const ZoomableView = forwardRef<ZoomableViewRef, ZoomableViewProps>(
       centered = true,
       enableTouchpadPinch = true,
       enableMousePan = true,
+      scrollSmooth = true,
       scaleContent = true,
     },
     ref
@@ -643,6 +645,8 @@ export const ZoomableView = forwardRef<ZoomableViewRef, ZoomableViewProps>(
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
           className={`relative h-full w-full overflow-auto ${
+            scrollSmooth && !isDragging ? 'scroll-smooth' : 'scroll-auto'
+          } ${
             isPanningActive
               ? isDragging
                 ? 'cursor-grabbing'
